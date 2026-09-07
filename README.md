@@ -45,24 +45,35 @@ All points here are critical but minimum, try to do better than these lists, or 
 | L-&-R                           | Requirement                                                                                                                                                                                          | Present (Y/N/-) |
 |---------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
 | Input Buffer                    | The game has action-chaining / combo mechanic, and provided a reasonable buffer (pre-input) context to cache an pending action, or overrides the current blocking action                             |                 |
-| Priority of action (overriding) | The game has action-chaining / combo mechanic, and provided a action prioritization, i.e., dodge/heal can override attack action, with or without transition animations present                      |                 |
+| Priority of action (overriding) | The game has action-chaining / combo mechanic, and has action prioritization capability, i.e., dodge/heal can override attack action, with or without transition animations present                  |                 |
 | Key-blocking Indication         | Input blocking only occurs when visually obvious (e.g., reload animation) or with clear, immediate, and specific audio/visual feedback indicating why and which input is blocked                     |                 |
 | Delay Indication                | Minimal delay between input and action. Any intentional delay (e.g., charge attack, charge jump) must be visually obvious and predictable                                                            |                 |
 | Toggle/Hold Indication          | State changing key actions (sprint, ADS, crouch, scope, etc.) can be set to Toggle or Hold individually                                                                                              |                 |
 | Interaction Animation Sync      | Avoid finishing the interaction later than animation finishes (preferably 300~500ms before), i.e., player sees animation finishes and sprints to next target——accidentally cancelled the interaction |                 |
 
-## Low Priority Supports
+## Low Priority Requirements
 
-| Universal Control Support                  | Requirement                                                                                                                                                                                                             | Present (Y/N/-) |
-|--------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |-----------------|
-| No Menu Key-blocking                       | No key-blocking anywhere in the menu, including menu-animations and startup logos                                                                                                                                       |                 |
-| Movement context prioritization            | The main game mechanic should have the highest movement state priority. i.e., A game features parkour should consider combat mode a distraction to avoid entering                                                       |                 |
+| Universal Control Support       | Requirement                                                                                                                                                                                                         | Present (Y/N/-) |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| No Menu Key-blocking            | No key-blocking anywhere in the menu, including menu animations and startup logos                                                                                                                                   |                 |
+| Movement Context Prioritization | The primary game mechanic should have the highest movement-state priority. For example, in a game centered around parkour, combat-state transitions should not unnecessarily override or interrupt player movement. |                 |
+| Movement Context Disambiguation | Avoid over-generalizing the movement system. Its complexity should correspond to the complexity of the intended environment and traversal mechanics.                                                                |                 |
 
-**Counter example on movement context issues**
-1. The player is using stealth mechanic to move across an NPC guarded field
-2. One enemy NPC noticed the player, the player wants to roll/dodge to a hiding spot to wait for enemy forgets him/her
-3. The player character instead enters combat mode, pulled weapons out, stands up, turned around facing enemy NPC (combat lock-in)
-4. Due to the previous combat lock-in turning, the player accidentally rolled/dodged into the second enemy NPC
-5. The second NPC immediately noticed the player, and stabbed the player
-6. All enemy NPC now knows the player is right there and attacks
-7. The player throws the controller away and called it a day
+### Counterexample: Movement Context Prioritization Failure
+
+1. The player uses a stealth mechanic to move across an NPC-guarded field, waiting for each enemy NPC to reposition and carefully looking for opportunities to sneak through.
+2. One enemy NPC notices the player. The player wants to roll/dodge toward a hiding spot and wait for the enemy to lose interest.
+3. Instead, the player character immediately enters combat mode, draws their weapons, stands up, and turns to face the enemy NPC, effectively becoming locked into combat behavior.
+4. Due to the forced combat-oriented turn, the player's roll/dodge is redirected and accidentally carries them into a second enemy NPC.
+5. The second NPC immediately notices the player and attacks.
+6. All nearby enemy NPCs are alerted and begin attacking the player.
+7. The player throws the controller away and calls it a day.
+
+### Counterexample: Movement Context Disambiguation Failure
+
+1. A parkour game implements crossbar-traversal movement. These bars connect roofs to roofs and cliffs to cliffs, and some require a long jump to reach the next bar.
+2. Because these crossbars are positioned high above the ground and often require long jumps, the traversal system prioritizes actions such as climbing down and jumping toward distant bars.
+3. During normal gameplay, a player climbs onto a short barn fence and now simply wants to get back down.
+4. The movement system recognizes the fence as the same type of traversal object as the high-altitude crossbars.
+5. Instead of simply stepping or jumping down, the character enters the more complex traversal behavior, such as hesitating, attempting to climb down, preparing for a long jump, or jump to the bar nearby
+6. The player is forced to fight against the traversal system to perform what should be a trivial movement action.
